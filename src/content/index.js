@@ -1,40 +1,66 @@
 const script = document.createElement('script');
-script.src = chrome.runtime.getURL('src/external/index.js');
+script.src = chrome.runtime.getURL('external/index.js');
 (document.body || document.documentElement).appendChild(script);
 
-let previewURL = ''
-let themeEditorURL = ''
-let currentURL = ''
+let previewURL = '';
+let themeEditorURL = '';
+let currentURL = '';
 
 document.addEventListener('GlobalVarValue', function (e) {
-  const Shopify = JSON.parse(e.detail)
+  const Shopify = JSON.parse(e.detail);
 
-  previewURL = 'https://' + Shopify.shop + '/?preview_theme_id=' + Shopify.theme.id
-  themeEditorURL = 'https://' + Shopify.shop + '/admin/themes/' + Shopify.theme.id
-  currentURL = 'https://' + Shopify.shop + window.location.pathname + '/?preview_theme_id=' + Shopify.theme.id
+  previewURL = 'https://' + Shopify.shop + '/?preview_theme_id=' + Shopify.theme.id;
+  themeEditorURL = 'https://' + Shopify.shop + '/admin/themes/' + Shopify.theme.id;
+  currentURL = 'https://' + Shopify.shop + window.location.pathname + '/?preview_theme_id=' + Shopify.theme.id;
 });
 
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.message === "copyPreview")
-        copyToTheClipboard(previewURL)
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.message === 'copyPreview') copyToTheClipboard(previewURL);
+  if (request.message === 'copyThemeEditor') copyToTheClipboard(themeEditorURL);
+  if (request.message === 'copyCurrentPageURL') copyToTheClipboard(currentURL);
+});
 
-      if (request.message === "copyThemeEditor")
-        copyToTheClipboard(themeEditorURL)
-
-      if (request.message === "copyCurrentPageURL")
-        copyToTheClipboard(currentURL)
+function copyToTheClipboard(text) {
+  return new Promise((resolve, reject) => {
+    if (
+      typeof navigator !== 'undefined' &&
+      typeof navigator.clipboard !== 'undefined' &&
+      navigator.permissions !== 'undefined'
+    ) {
+      const type = 'text/plain';
+      const blob = new Blob([text], { type });
+      const data = [new ClipboardItem({ [type]: blob })];
+      navigator.permissions.query({ name: 'clipboard-write' }).then((permission) => {
+        if (permission.state === 'granted' || permission.state === 'prompt') {
+          navigator.clipboard.write(data).then(resolve, reject).catch(reject);
+        } else {
+          reject(new Error('Permission not granted!'));
+        }
+      });
+    } else if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
+      const textarea = document.createElement('textarea');
+      textarea.textContent = text;
+      textarea.style.position = 'fixed';
+      textarea.style.width = '2em';
+      textarea.style.height = '2em';
+      textarea.style.padding = 0;
+      textarea.style.border = 'none';
+      textarea.style.outline = 'none';
+      textarea.style.boxShadow = 'none';
+      textarea.style.background = 'transparent';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        resolve();
+      } catch (e) {
+        document.body.removeChild(textarea);
+        reject(e);
+      }
+    } else {
+      reject(new Error('None of copying methods are supported by this browser!'));
     }
-);
-
-async function copyToTheClipboard(textToCopy){
-  const el = document.createElement('textarea');
-  el.value = textToCopy;
-  el.setAttribute('readonly', '');
-  el.style.position = 'absolute';
-  el.style.left = '-9999px';
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);
+  });
 }

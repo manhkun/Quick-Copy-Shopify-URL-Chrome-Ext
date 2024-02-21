@@ -27,9 +27,9 @@ export default defineManifest({
   ],
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-34.png', 'img/logo-48.png', 'img/logo-128.png', 'src/external/index.js'],
-      matches: [],
+      resources: ['external/index.js'],
+      matches: ["<all_urls>"]
     },
   ],
-  permissions: ["clipboardWrite", "activeTab", "scripting"],
+  permissions: ["activeTab", "scripting"],
 })
