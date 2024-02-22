@@ -7,11 +7,11 @@ let themeEditorURL = '';
 let currentURL = '';
 
 document.addEventListener('GlobalVarValue', function (e) {
-  const Shopify = JSON.parse(e.detail);
+  const data = JSON.parse(e.detail);
 
-  previewURL = 'https://' + Shopify.shop + '/?preview_theme_id=' + Shopify.theme.id;
-  themeEditorURL = 'https://' + Shopify.shop + '/admin/themes/' + Shopify.theme.id;
-  currentURL = 'https://' + Shopify.shop + window.location.pathname + '/?preview_theme_id=' + Shopify.theme.id;
+  previewURL = 'https://' + data.shop + '/?preview_theme_id=' + data.themeId;
+  themeEditorURL = 'https://' + data.shop + '/admin/themes/' + data.themeId;
+  currentURL = 'https://' + data.shop + window.location.pathname + '/?preview_theme_id=' + data.themeId;
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
