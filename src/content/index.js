@@ -9,9 +9,9 @@ let currentURL = '';
 document.addEventListener('GlobalVarValue', function (e) {
   const data = JSON.parse(e.detail);
 
-  previewURL = 'https://' + data.shop + '/?preview_theme_id=' + data.themeId;
+  previewURL = 'https://' + data.shop + '?preview_theme_id=' + data.themeId;
   themeEditorURL = 'https://' + data.shop + '/admin/themes/' + data.themeId;
-  currentURL = 'https://' + data.shop + window.location.pathname + '/?preview_theme_id=' + data.themeId;
+  currentURL = 'https://' + data.shop + window.location.pathname + '?preview_theme_id=' + data.themeId;
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
