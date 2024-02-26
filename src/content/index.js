@@ -10,7 +10,7 @@ document.addEventListener('GlobalVarValue', function (e) {
   const data = JSON.parse(e.detail);
 
   previewURL = 'https://' + data.shop + '?preview_theme_id=' + data.themeId;
-  themeEditorURL = 'https://' + data.shop + '/admin/themes/' + data.themeId;
+  themeEditorURL = 'https://' + data.shop + '/admin/themes/' + data.themeId + '/editor';
   currentURL = 'https://' + data.shop + window.location.pathname + '?preview_theme_id=' + data.themeId;
 });
 
